@@ -6,7 +6,7 @@
     "node": "10.x"
   },
   "scripts": {
-    "start": "node server",
+    "start": "nodemon server",
     "build": "cd client/ && npm install && npm run build"
   },
   "cacheDirectories": [
@@ -14,6 +14,8 @@
     "react-ui/node_modules"
   ],
   "dependencies": {
+    "@tensorflow/tfjs-node": "^3.3.0",
+    "axios": "^0.21.1",
     "express": "^4.16.4"
   },
   "devDependencies": {}

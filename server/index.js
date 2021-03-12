@@ -4,7 +4,12 @@ const app = express();
 
 const PORT = process.env.PORT || 8080;
 
+require('../secret');
+
 const createApp = () => {
+  // api routes
+  app.use('/api', require('./api'));
+
   app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
   // any remaining requests with an extension (.js, .css, etc.) send 404

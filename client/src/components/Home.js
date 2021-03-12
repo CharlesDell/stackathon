@@ -18,9 +18,8 @@ const Home = () => {
 
   return (
     <Container maxWidth='sm' className={classes.container}>
-      <Typography variant='h4'>Find out how Twitter feels about ...</Typography>
+      <Typography variant='h4'>See how Twitter feels about ...</Typography>
       <Search />
-      <Typography variant='h4'>Hashtag</Typography>
     </Container>
   );
 };
