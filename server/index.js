@@ -35,10 +35,10 @@ const startListening = () => {
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`));
 };
 
-async function bootApp() {
+const bootApp = async () => {
   await createApp();
   await startListening();
-}
+};
 
 if (require.main === module) {
   bootApp();
