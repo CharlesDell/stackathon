@@ -11,6 +11,8 @@ import Button from '@material-ui/core/Button';
 import Slide from '@material-ui/core/Slide';
 import Grid from '@material-ui/core/Grid';
 
+import axios from 'axios';
+
 const useStyles = makeStyles((theme) => ({
   margin: {
     margin: theme.spacing(1),
@@ -36,15 +38,25 @@ const Search = () => {
   const { open, hashtag } = state;
 
   const handleChange = (event) => {
-    state[event.target.name] = event.target.value;
+    setState({ ...state, [event.target.name]: event.target.value });
   };
 
   const handleClick = () => () => {
-    setState({ open: true });
+    if (inputValid()) {
+      const { data } = axios.get(`/api/prediction/?query=${hashtag}`);
+      setState({ ...state, open: true });
+      console.log(data);
+    }
   };
 
   const handleClose = () => {
     setState({ ...state, open: false });
+  };
+
+  const inputValid = () => {
+    // console.log(hashtag);
+    // console.log(hashtag.match(/\s/g).length);
+    return hashtag && !hashtag.match(/\s/g);
   };
 
   return (
@@ -57,6 +69,7 @@ const Search = () => {
           <Grid item>
             <TextField
               id='search'
+              name='hashtag'
               label='Hashtag'
               color='secondary'
               value={hashtag}
@@ -72,7 +85,7 @@ const Search = () => {
         autoHideDuration={6000}
         open={open}
         onClose={handleClose}
-        message='I love snacks'
+        message={`Searching Twitter for #${hashtag}`}
         action={
           <React.Fragment>
             <IconButton

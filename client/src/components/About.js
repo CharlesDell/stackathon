@@ -28,17 +28,18 @@ const About = () => {
         <Typography variant='h3'>Hashtag</Typography>
         <Typography variant='body1' className={classes.subtitle}>
           A machine learning progressive web application built with
-          TensorFlow.js on the PERN stack
+          TensorFlow.js on the (P)ERN stack
         </Typography>
         <Typography variant='h4'>Goal</Typography>
         <Typography variant='body1' className={classes.content}>
-          The goal of this project is to perform sentiment analysis on tweets
-          based on their hashtag and see how well a machine learning algorithm
+          Hashtag aims to perform sentiment analysis on tweets based on their,
+          you guessed it, hashtag and see how well a machine learning algorithm
           can gauge Twitter's stance on a particular subject.
         </Typography>
         <Typography variant='h4'>Tech</Typography>
         <Typography variant='body1' className={classes.content}>
-          Lorem ipsum
+          Hashtag is built on the PERN stack, or rather just ERN since PostgrSQL
+          is not being used
         </Typography>
       </Container>
     </div>
