@@ -11,6 +11,13 @@ import Button from '@material-ui/core/Button';
 import Slide from '@material-ui/core/Slide';
 import Grid from '@material-ui/core/Grid';
 
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import ListItem from '@material-ui/core/ListItem';
+import List from '@material-ui/core/List';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
@@ -33,19 +40,20 @@ const Search = () => {
   const [state, setState] = useState({
     open: false,
     hashtag: '',
+    data: [],
   });
 
-  const { open, hashtag } = state;
+  const { open, hashtag, data } = state;
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.value });
   };
 
-  const handleClick = () => () => {
+  const handleClick = () => async () => {
     if (inputValid()) {
-      const { data } = axios.get(`/api/prediction/?query=${hashtag}`);
       setState({ ...state, open: true });
-      console.log(data);
+      const { data } = await axios.get(`/api/prediction/?query=${hashtag}`);
+      setState({ ...state, data: data });
     }
   };
 
@@ -79,6 +87,28 @@ const Search = () => {
         </Grid>
         <Button onClick={handleClick()}>Submit</Button>
       </FormControl>
+      <List>
+        {data.map((elem) => {
+          return (
+            <ListItem key={elem.id}>
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls='panel1a-content'
+                  id='panel1a-header'
+                >
+                  <Typography className={classes.heading}>
+                    {`ID: ${elem.id}`}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography>{elem.text}</Typography>
+                </AccordionDetails>
+              </Accordion>
+            </ListItem>
+          );
+        })}
+      </List>
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         TransitionComponent={SlideTransition}
