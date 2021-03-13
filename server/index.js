@@ -4,7 +4,7 @@ const app = express();
 
 const PORT = process.env.PORT || 8080;
 
-require('../secret');
+if (process.env.NODE_ENV !== 'production') require('../secrets');
 
 const createApp = () => {
   // api routes
