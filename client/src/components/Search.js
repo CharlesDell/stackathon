@@ -40,10 +40,10 @@ const Search = () => {
   const [state, setState] = useState({
     open: false,
     hashtag: '',
-    data: [],
+    tweets: [],
   });
 
-  const { open, hashtag, data } = state;
+  const { open, hashtag, tweets } = state;
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.value });
@@ -53,7 +53,7 @@ const Search = () => {
     if (inputValid()) {
       setState({ ...state, open: true });
       const { data } = await axios.get(`/api/prediction/?query=${hashtag}`);
-      setState({ ...state, data: data });
+      setState({ ...state, tweets: data.data });
     }
   };
 
@@ -87,28 +87,30 @@ const Search = () => {
         </Grid>
         <Button onClick={handleClick()}>Submit</Button>
       </FormControl>
-      <List>
-        {data.map((elem) => {
-          return (
-            <ListItem key={elem.id}>
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls='panel1a-content'
-                  id='panel1a-header'
-                >
-                  <Typography className={classes.heading}>
-                    {`ID: ${elem.id}`}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography>{elem.text}</Typography>
-                </AccordionDetails>
-              </Accordion>
-            </ListItem>
-          );
-        })}
-      </List>
+      {tweets && (
+        <List>
+          {tweets.map((tweet) => {
+            return (
+              <ListItem key={tweet.id}>
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls='panel1a-content'
+                    id='panel1a-header'
+                  >
+                    <Typography className={classes.heading}>
+                      {`ID: ${tweet.id}`}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Typography>{tweet.text}</Typography>
+                  </AccordionDetails>
+                </Accordion>
+              </ListItem>
+            );
+          })}
+        </List>
+      )}
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         TransitionComponent={SlideTransition}

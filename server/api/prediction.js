@@ -23,6 +23,7 @@ router.get('/', async (req, res, next) => {
 
     console.log('--- Making Prediction ---');
 
+    console.log(data);
     res.send(data);
   } catch (err) {
     next(err);
