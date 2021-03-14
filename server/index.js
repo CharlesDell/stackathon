@@ -7,6 +7,9 @@ const PORT = process.env.PORT || 8080;
 if (process.env.NODE_ENV !== 'production') require('../secrets');
 
 const createApp = () => {
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+
   // api routes
   app.use('/api', require('./api'));
 

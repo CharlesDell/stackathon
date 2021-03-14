@@ -39,7 +39,7 @@ const About = () => {
         <Typography variant='h4'>Tech</Typography>
         <Typography variant='body1' className={classes.content}>
           Hashtag is built on the PERN stack, or rather just ERN since PostgrSQL
-          is not being used
+          is not being used. Tensorflow.js Universal Sentence Encoder
         </Typography>
       </Container>
     </div>

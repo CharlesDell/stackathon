@@ -11,12 +11,13 @@ import Button from '@material-ui/core/Button';
 import Slide from '@material-ui/core/Slide';
 import Grid from '@material-ui/core/Grid';
 
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import ListItem from '@material-ui/core/ListItem';
-import List from '@material-ui/core/List';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+
+import TweetList from './TweetList';
+import Snack from './Snack';
 
 import axios from 'axios';
 
@@ -29,6 +30,9 @@ const useStyles = makeStyles((theme) => ({
     height: 25,
     width: 25,
   },
+  cardHeader: {
+    height: 25,
+  },
 }));
 
 function SlideTransition(props) {
@@ -38,12 +42,22 @@ function SlideTransition(props) {
 const Search = () => {
   const classes = useStyles();
   const [state, setState] = useState({
-    open: false,
+    snack: <div />,
     hashtag: '',
     tweets: [],
+    sentiment: 0,
+    backgroundColor: '#ffe57f',
+    finished: true,
   });
 
-  const { open, hashtag, tweets } = state;
+  const {
+    snack,
+    hashtag,
+    tweets,
+    sentiment,
+    finished,
+    backgroundColor,
+  } = state;
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.value });
@@ -51,9 +65,44 @@ const Search = () => {
 
   const handleClick = () => async () => {
     if (inputValid()) {
-      setState({ ...state, open: true });
-      const { data } = await axios.get(`/api/prediction/?query=${hashtag}`);
-      setState({ ...state, tweets: data.data });
+      setState({
+        ...state,
+        snack: (
+          <Snack
+            open={true}
+            handleClose={handleClose}
+            message={`Searching Twitter for #${hashtag}`}
+            severity='info'
+          />
+        ),
+      });
+      const foundTweets = await getTweets();
+      // setState({
+      //   ...state,
+      //   snack: (
+      //     <Snack
+      //       open={true}
+      //       handleClose={handleClose}
+      //       message={`Found ${foundTweets.length} tweets! Proceeding to Sentiment Analysis`}
+      //       severity='success'
+      //     />
+      //   ),
+      // });
+      const sentiment = await getSentiment(foundTweets);
+      // setState({
+      //   ...state,
+      //   sentiment: sentiment,
+      //   finsihed: true,
+      //   snack: (
+      //     <Snack
+      //       open={true}
+      //       handleClose={handleClose}
+      //       message={`Analysis Concluded`}
+      //       severity='success'
+      //     />
+      //   ),
+      // });
+      console.log(state);
     }
   };
 
@@ -62,9 +111,34 @@ const Search = () => {
   };
 
   const inputValid = () => {
-    // console.log(hashtag);
-    // console.log(hashtag.match(/\s/g).length);
     return hashtag && !hashtag.match(/\s/g);
+  };
+
+  const getTweets = async () => {
+    const { data } = await axios.get(`/api/twitter/?query=${hashtag}`);
+    setState({ ...state, tweets: data });
+    return data;
+  };
+
+  const getSentiment = async (tweets) => {
+    const sentiment = await Promise.all(
+      tweets.map(async (tweet) => {
+        const { data } = await axios.post('/api/google-cloud/', {
+          text: tweet.text,
+        });
+        return data.score;
+      })
+    );
+
+    if (sentiment > 0.25) {
+      setState({ ...state, backgroundColor: '#388e3c' });
+    } else if (sentiment < -0.25) {
+      setState({ ...state, backgroundColor: '#e53935' });
+    } else {
+      setState({ ...state, backgroundColor: '#ffe57f' });
+    }
+
+    return sentiment.reduce((acc, val) => acc + val, 0) / sentiment.length;
   };
 
   return (
@@ -87,50 +161,23 @@ const Search = () => {
         </Grid>
         <Button onClick={handleClick()}>Submit</Button>
       </FormControl>
-      {tweets && (
-        <List>
-          {tweets.map((tweet) => {
-            return (
-              <ListItem key={tweet.id}>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls='panel1a-content'
-                    id='panel1a-header'
-                  >
-                    <Typography className={classes.heading}>
-                      {`ID: ${tweet.id}`}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Typography>{tweet.text}</Typography>
-                  </AccordionDetails>
-                </Accordion>
-              </ListItem>
-            );
-          })}
-        </List>
+      {finished ? (
+        <Card>
+          <CardHeader
+            className={classes.cardHeader}
+            style={{ backgroundColor: backgroundColor }}
+          ></CardHeader>
+          <CardContent>
+            <Typography gutterBottom variant='h5' component='h2'>
+              {sentiment}
+            </Typography>
+          </CardContent>
+        </Card>
+      ) : (
+        ''
       )}
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        TransitionComponent={SlideTransition}
-        autoHideDuration={6000}
-        open={open}
-        onClose={handleClose}
-        message={`Searching Twitter for #${hashtag}`}
-        action={
-          <React.Fragment>
-            <IconButton
-              size='small'
-              aria-label='close'
-              color='inherit'
-              onClick={handleClose}
-            >
-              <CloseIcon fontSize='small' />
-            </IconButton>
-          </React.Fragment>
-        }
-      />
+      <TweetList tweets={tweets} />
+      {snack}
     </React.Fragment>
   );
 };
