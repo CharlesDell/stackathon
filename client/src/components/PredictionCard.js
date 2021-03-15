@@ -22,7 +22,7 @@ const PredictionCard = (props) => {
       {!isLoadingPrediction && (
         <Card className={classes.card}>
           <CardContent style={{ backgroundColor: backgroundColor }}>
-            <Typography gutterBottom variant='h5' component='h2'>
+            <Typography variant='h5' component='h2'>
               Sentiment: {prediction.toFixed(3)}
             </Typography>
           </CardContent>

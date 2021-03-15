@@ -30,6 +30,15 @@ const About = () => {
           A machine learning progressive web application built with the Google
           Cloud API
         </Typography>
+        <Typography variant='body1'>
+          A score from 0.25-1.0 indicates and overall positive sentiment
+        </Typography>
+        <Typography variant='body1'>
+          A score from 0.25-(-0.25) indicates and overall neutral sentiment
+        </Typography>
+        <Typography variant='body1'>
+          A score from -0.25-(-1.0) indicates and overall negative sentiment,
+        </Typography>
         <Typography variant='h4'>Goal</Typography>
         <Typography variant='body1' className={classes.content}>
           Hashtag aims to perform sentiment analysis on tweets based on their,
@@ -80,3 +89,10 @@ const About = () => {
 };
 
 export default About;
+
+
+<Typography variant='h5'>
+          A score from 0.25-1.0 indicates and overall positive sentiment,<br> A
+          score from 0.25-(-0.25) indicates and overall neutral sentiment,<br> A
+          score from -0.25-(-1.0) indicates and overall negative sentiment,
+        </Typography>
