@@ -109,7 +109,6 @@ class Search extends React.Component {
             prediction={prediction}
           />
         </div>
-        <Typography variant='h5'>Analyzed Tweets:</Typography>
         <TweetList isLoadingTweets={isLoadingTweets} tweets={tweets} />
       </React.Fragment>
     );

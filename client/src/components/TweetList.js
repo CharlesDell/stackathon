@@ -21,6 +21,9 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.typography.pxToRem(15),
     fontWeight: theme.typography.fontWeightRegular,
   },
+  item: {
+    width: '100%',
+  },
 }));
 
 const TweetList = (props) => {
@@ -31,28 +34,31 @@ const TweetList = (props) => {
   return (
     <React.Fragment>
       {!isLoadingTweets && (
-        <List>
-          {tweets.map((tweet) => {
-            return (
-              <ListItem key={tweet.id}>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls='panel1a-content'
-                    id='panel1a-header'
-                  >
-                    <Typography className={classes.heading}>
-                      {`ID: ${tweet.id}`}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Typography>{tweet.text}</Typography>
-                  </AccordionDetails>
-                </Accordion>
-              </ListItem>
-            );
-          })}
-        </List>
+        <React.Fragment>
+          <Typography variant='h5'>Analyzed Tweets:</Typography>
+          <List>
+            {tweets.map((tweet) => {
+              return (
+                <ListItem key={tweet.id}>
+                  <Accordion className={classes.item}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls='panel1a-content'
+                      id='panel1a-header'
+                    >
+                      <Typography className={classes.heading}>
+                        {`ID: ${tweet.id}`}
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography>{tweet.text}</Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                </ListItem>
+              );
+            })}
+          </List>
+        </React.Fragment>
       )}
     </React.Fragment>
   );
