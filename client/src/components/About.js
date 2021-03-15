@@ -89,10 +89,3 @@ const About = () => {
 };
 
 export default About;
-
-
-<Typography variant='h5'>
-          A score from 0.25-1.0 indicates and overall positive sentiment,<br> A
-          score from 0.25-(-0.25) indicates and overall neutral sentiment,<br> A
-          score from -0.25-(-1.0) indicates and overall negative sentiment,
-        </Typography>
