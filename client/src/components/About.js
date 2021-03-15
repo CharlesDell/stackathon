@@ -51,28 +51,28 @@ const About = () => {
         <Typography variant='h6'>(or the Troubles with TensorFlow)</Typography>
         <Typography variant='body1' className={classes.content}>
           This project was originally intended to be built with TensorFlow.js,
-          an offshot of the hugely popular python based machine learning
+          an offshoot of the hugely popular python based machine learning
           library. However, as the project continued it became increasingly
           clear that TensorFlow was never intended to be a robust solution for
           javascript. I ran into the most amount of problems when it came to
           training the model I built (the code for which has been left on the
-          prjects <a href='https://github.com/CharlesDell/stackathon'>github</a>
+          project's{' '}
+          <a href='https://github.com/CharlesDell/stackathon'>github</a>
           for posterity). I found that javascript was never meant to (or perhaps
           I was never meant to) format and sift through multi-million lined .csv
           files as I would constantly exceed my computers memory limits, but
           rather that that task should be left to python. In walks Google
           Cloud's Natural Language API, a fully functioning, scalable, and
-          easily implemented solution. The NL API is a incredibley useful tool
+          easily implemented solution. The NL API is an incredibly useful tool
           for performing rich text analysis, beyond its use here, that uses an
           incredibly fascinating deep learning model developed by Google.
         </Typography>
         <Typography variant='h4'>The Takeaway</Typography>
         <Typography variant='body1' className={classes.content}>
           Overall, I feel mildly defeated by TensorFlow, but nevertheless still
-          appreaciative of everything I learned during the productive struggle
-          in trying to get it to work. Machine learning is an incredibly dense
-          but rewarding topic and I learned a lot building the application.
-          Enjoy.
+          appreciative of everything I learned during the productive struggle in
+          trying to get it to work. Machine learning is an incredibly dense but
+          rewarding topic and I learned a lot building the application. Enjoy.
         </Typography>
       </Container>
     </div>
