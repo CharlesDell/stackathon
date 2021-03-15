@@ -1,185 +1,141 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { getTweets as getTweetsAndMakePrediction } from '../reducers/tweets';
+
+import { withStyles } from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
-import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
-import Snackbar from '@material-ui/core/Snackbar';
-import CloseIcon from '@material-ui/icons/Close';
 import Button from '@material-ui/core/Button';
-import Slide from '@material-ui/core/Slide';
 import Grid from '@material-ui/core/Grid';
 
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
+import PredictionCard from './PredictionCard';
 import TweetList from './TweetList';
-import Snack from './Snack';
+import Notifier from './Notifier';
 
-import axios from 'axios';
+import {
+  enqueueSnackbar as enqueueSnackbarAction,
+  closeSnackbar as closeSnackbarAction,
+} from '../reducers/snackbar';
 
-const useStyles = makeStyles((theme) => ({
+const styles = (theme) => ({
   margin: {
     margin: theme.spacing(1),
   },
-  logo: {
-    marginRight: theme.spacing(1),
-    height: 25,
-    width: 25,
+  cardContainer: {
+    display: 'flex',
+    justifyContent: 'center',
   },
-  cardHeader: {
-    height: 25,
-  },
-}));
+});
 
-function SlideTransition(props) {
-  return <Slide {...props} direction='down' />;
+class Search extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      hashtag: '',
+    };
+  }
+
+  handleChange = (event) => {
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
+  handleClick = () => async () => {
+    if (this.inputValid()) {
+      this.props.enqueueSnackbar({
+        message: `Searching Twitter for #${this.state.hashtag}`,
+        options: {
+          key: new Date().getTime() + Math.random(),
+          variant: 'info',
+          action: (key) => (
+            <IconButton
+              size='small'
+              aria-label='close'
+              color='inherit'
+              onClick={() => this.props.closeSnackbar(key)}
+            >
+              <CloseIcon fontSize='small' />
+            </IconButton>
+          ),
+        },
+      });
+      this.props.getTweetsAndMakePrediction(this.state.hashtag);
+    }
+  };
+
+  inputValid = () => {
+    return this.state.hashtag && !this.state.hashtag.match(/\s/g);
+  };
+
+  render() {
+    const { hashtag } = this.state;
+    const {
+      classes,
+      tweets,
+      isLoadingTweets,
+      isLoadingPrediction,
+      backgroundColor,
+      prediction,
+    } = this.props;
+    return (
+      <React.Fragment>
+        <Notifier />
+        <FormControl className={classes.margin}>
+          <Grid container spacing={1} alignItems='flex-end'>
+            <Grid item>
+              <Typography variant='h5'>#</Typography>
+            </Grid>
+            <Grid item>
+              <TextField
+                id='search'
+                name='hashtag'
+                label='Hashtag'
+                color='secondary'
+                value={hashtag}
+                onChange={this.handleChange}
+              />
+            </Grid>
+          </Grid>
+          <Button onClick={this.handleClick()}>Submit</Button>
+        </FormControl>
+        <div className={classes.cardContainer}>
+          <PredictionCard
+            isLoadingPrediction={isLoadingPrediction}
+            backgroundColor={backgroundColor}
+            prediction={prediction}
+          />
+        </div>
+        <Typography variant='h5'>Analyzed Tweets:</Typography>
+        <TweetList isLoadingTweets={isLoadingTweets} tweets={tweets} />
+      </React.Fragment>
+    );
+  }
 }
 
-const Search = () => {
-  const classes = useStyles();
-  const [state, setState] = useState({
-    snack: <div />,
-    hashtag: '',
-    tweets: [],
-    sentiment: 0,
-    backgroundColor: '#ffe57f',
-    finished: true,
-  });
-
-  const {
-    snack,
-    hashtag,
-    tweets,
-    sentiment,
-    finished,
-    backgroundColor,
-  } = state;
-
-  const handleChange = (event) => {
-    setState({ ...state, [event.target.name]: event.target.value });
+const mapDispatch = (dispatch) => {
+  return {
+    getTweetsAndMakePrediction: (hashtag) =>
+      dispatch(getTweetsAndMakePrediction(hashtag)),
+    enqueueSnackbar: (...args) => dispatch(enqueueSnackbarAction(...args)),
+    closeSnackbar: (...args) => dispatch(closeSnackbarAction(...args)),
   };
-
-  const handleClick = () => async () => {
-    if (inputValid()) {
-      setState({
-        ...state,
-        snack: (
-          <Snack
-            open={true}
-            handleClose={handleClose}
-            message={`Searching Twitter for #${hashtag}`}
-            severity='info'
-          />
-        ),
-      });
-      const foundTweets = await getTweets();
-      // setState({
-      //   ...state,
-      //   snack: (
-      //     <Snack
-      //       open={true}
-      //       handleClose={handleClose}
-      //       message={`Found ${foundTweets.length} tweets! Proceeding to Sentiment Analysis`}
-      //       severity='success'
-      //     />
-      //   ),
-      // });
-      const sentiment = await getSentiment(foundTweets);
-      // setState({
-      //   ...state,
-      //   sentiment: sentiment,
-      //   finsihed: true,
-      //   snack: (
-      //     <Snack
-      //       open={true}
-      //       handleClose={handleClose}
-      //       message={`Analysis Concluded`}
-      //       severity='success'
-      //     />
-      //   ),
-      // });
-      console.log(state);
-    }
-  };
-
-  const handleClose = () => {
-    setState({ ...state, open: false });
-  };
-
-  const inputValid = () => {
-    return hashtag && !hashtag.match(/\s/g);
-  };
-
-  const getTweets = async () => {
-    const { data } = await axios.get(`/api/twitter/?query=${hashtag}`);
-    setState({ ...state, tweets: data });
-    return data;
-  };
-
-  const getSentiment = async (tweets) => {
-    const sentiment = await Promise.all(
-      tweets.map(async (tweet) => {
-        const { data } = await axios.post('/api/google-cloud/', {
-          text: tweet.text,
-        });
-        return data.score;
-      })
-    );
-
-    if (sentiment > 0.25) {
-      setState({ ...state, backgroundColor: '#388e3c' });
-    } else if (sentiment < -0.25) {
-      setState({ ...state, backgroundColor: '#e53935' });
-    } else {
-      setState({ ...state, backgroundColor: '#ffe57f' });
-    }
-
-    return sentiment.reduce((acc, val) => acc + val, 0) / sentiment.length;
-  };
-
-  return (
-    <React.Fragment>
-      <FormControl className={classes.margin}>
-        <Grid container spacing={1} alignItems='flex-end'>
-          <Grid item>
-            <Typography variant='h5'>#</Typography>
-          </Grid>
-          <Grid item>
-            <TextField
-              id='search'
-              name='hashtag'
-              label='Hashtag'
-              color='secondary'
-              value={hashtag}
-              onChange={handleChange}
-            />
-          </Grid>
-        </Grid>
-        <Button onClick={handleClick()}>Submit</Button>
-      </FormControl>
-      {finished ? (
-        <Card>
-          <CardHeader
-            className={classes.cardHeader}
-            style={{ backgroundColor: backgroundColor }}
-          ></CardHeader>
-          <CardContent>
-            <Typography gutterBottom variant='h5' component='h2'>
-              {sentiment}
-            </Typography>
-          </CardContent>
-        </Card>
-      ) : (
-        ''
-      )}
-      <TweetList tweets={tweets} />
-      {snack}
-    </React.Fragment>
-  );
 };
 
-export default Search;
+const mapState = (state) => {
+  return {
+    tweets: state.tweets.data,
+    isLoadingTweets: state.tweets.isLoading,
+    prediction: state.prediction.value,
+    backgroundColor: state.prediction.backgroundColor,
+    isLoadingPrediction: state.prediction.isLoading,
+  };
+};
+
+export default connect(
+  mapState,
+  mapDispatch
+)(withStyles(styles, { withTheme: true })(Search));

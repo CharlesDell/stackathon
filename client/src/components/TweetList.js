@@ -17,24 +17,20 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 const useStyles = makeStyles((theme) => ({
-  margin: {
-    margin: theme.spacing(1),
-  },
-  logo: {
-    marginRight: theme.spacing(1),
-    height: 25,
-    width: 25,
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular,
   },
 }));
 
 const TweetList = (props) => {
   const classes = useStyles();
 
-  const { tweets } = props;
+  const { isLoadingTweets, tweets } = props;
 
   return (
     <React.Fragment>
-      {tweets && (
+      {!isLoadingTweets && (
         <List>
           {tweets.map((tweet) => {
             return (
