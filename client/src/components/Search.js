@@ -26,6 +26,12 @@ const styles = (theme) => ({
   margin: {
     margin: theme.spacing(1),
   },
+  input: {
+    margin: theme.spacing(1),
+  },
+  button: {
+    margin: theme.spacing(1),
+  },
   cardContainer: {
     display: 'flex',
     justifyContent: 'center',
@@ -85,7 +91,12 @@ class Search extends React.Component {
       <React.Fragment>
         <Notifier />
         <FormControl className={classes.margin}>
-          <Grid container spacing={1} alignItems='flex-end'>
+          <Grid
+            className={classes.input}
+            container
+            spacing={1}
+            alignItems='flex-end'
+          >
             <Grid item>
               <Typography variant='h5'>#</Typography>
             </Grid>
@@ -100,7 +111,9 @@ class Search extends React.Component {
               />
             </Grid>
           </Grid>
-          <Button onClick={this.handleClick()}>Submit</Button>
+          <Button className={classes.button} onClick={this.handleClick()}>
+            Submit
+          </Button>
         </FormControl>
         <div className={classes.cardContainer}>
           <PredictionCard
